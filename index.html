@@ -1,0 +1,451 @@
+<html ng-app="IRapp">
+	<head>
+		<meta charset="Utf-8">
+		<title>IR Project</title>
+		<script src="bower_components/alertify.js-0.3.11/lib/alertify.min.js"></script>
+		<script src='bower_components/angular/angular.js'></script>
+		<script src='bower_components/jquery/dist/jquery.min.js'></script>
+		<script src='bower_components/bootstrap/dist/js/bootstrap.min.js'></script>
+		
+		<script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+		<script src="bower_components/angular-animate/angular-animate.min.js"></script>
+		<script src="bower_components/videogular/videogular.js"></script>
+		<script src="bower_components/videogular-controls/controls.js"></script>
+		<script src="bower_components/videogular-overlay-play/overlay-play.js"></script>
+		<script src="bower_components/videogular-poster/poster.js"></script>
+		<script src="bower_components/videogular-buffering/buffering.js"></script>
+		
+
+		<link rel="stylesheet" href="bower_components/videogular-themes-default/videogular.min.css">
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="bower_components/font-awsome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="bower_components/alertify.js-0.3.11/themes/alertify.core.css">
+		<link rel="stylesheet" href="bower_components/alertify.js-0.3.11/themes/alertify.default.css">
+	
+		<style>
+			body{
+				height:100%;
+				overflow: hidden;
+				background-image: url('images/header.svg'),	linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+				/*background-size: cover;*/
+			}
+			.page{
+				height: 100%;
+				
+				padding:0;
+			}
+			.subpage{
+				width:50%;
+				height:50%;
+				position: absolute;
+				
+			}
+
+			.midpage{
+				position:absolute;
+				/*width:30%;*/
+				-webkit-transition: all 0.4s ease;
+				/*left:35%;*/
+				
+				background: rgba(255,255,255,0.2);
+				border-radius:2px;
+				color: #37474F;
+			}
+			.midpage input{
+				opacity: 0.6;
+			}
+
+			.midpage input:focus{
+				opacity: 0.8;
+			}
+			.searched{
+				height:400px;
+				top: calc(50% - 200px);
+			}
+			.notsearched{
+				height:200px;
+				top: calc(50% - 100px);
+			}
+			.searchComplete{
+				height: 200px;
+				top: calc(30% - 100px);
+			}
+			.search{
+				text-align: center;
+			}
+			
+			.search i{
+				margin-top: 20px;
+				
+			}
+			.search input{	
+				margin-top: 20px;
+			}
+
+			.botpage{
+				height:200px;
+				background: white;
+				top: calc(50% + 100px);
+			}
+			
+			.search-result{
+				margin-top:7px;
+				height:200px;
+				overflow-y:auto;
+			}
+
+			.search-result .each{
+				padding-top:4.5px;
+				padding-top:4.5px;
+				height:50px;
+				cursor: pointer;
+			}
+			.search-result .each:hover{
+				background: rgba(0,0,0,0.2)
+			}
+			.search-result .each:active{
+				background: rgba(0,0,13,0.5);
+				
+			}
+			.search-result .each span{
+				
+				line-height:40px;
+				font-size:25px;
+				vertical-align: middle;
+			}
+
+			/*
+			 *  STYLE 1
+			 */
+
+			.style-2::-webkit-scrollbar-track
+			{
+				-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.0);
+				border-radius: 6px;
+				/*background-color: #F5F5F5;*/
+			}
+
+			.style-2::-webkit-scrollbar
+			{
+				width: 6px;
+				/*background-color: #F5F5F5;*/
+			}
+
+			.style-2::-webkit-scrollbar-thumb
+			{
+				border-radius: 6px;
+				-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
+				background-color: rgba(0,0,0,0.3);
+			}
+			.video-show{
+				position:absolute;
+				top: 0%;
+				width:100%;
+				height:100%;
+				-webkit-transition: all 0.5s ease;
+				transition: all 0.5s ease;
+				-webkit-transform: scale(1,1);
+    			transform: scale(1,1);
+				opacity: 1;
+				
+			}
+
+			.video-show.ng-hide{
+				-webkit-transition: all 0.5s ease;
+				transition: all 0.5s ease;
+				/*top:70%;*/
+				-webkit-transform: scale(0,0); 
+    			transform: scale(0.5,0.5);
+				opacity: 0;
+				
+			}
+
+			.input-lg{
+				-webkit-transition: 0s all linear;
+			}
+
+			.end-video{
+				position: absolute;
+				font-size: 3em;
+				color: white;
+				right:5px;
+				width:50px;
+				height:50px;
+				top: 10px;
+				opacity: 0.7;
+				z-index: 101;
+				cursor: pointer;
+			}
+			.end-video:hover{
+				opacity: 0.9;
+			}
+			.spinner.ng-hide{
+				 -webkit-transition: 0s all;
+			}
+			
+			.spinner {
+				margin-top: 55px;
+				
+				-webkit-animation: rotator 1.4s linear infinite;
+				       	animation: rotator 1.4s linear infinite;
+				
+			}
+
+			@-webkit-keyframes rotator {
+			  0% {
+			    -webkit-transform: rotate(0deg);
+			            transform: rotate(0deg);
+			  }
+			  100% {
+			    -webkit-transform: rotate(270deg);
+			            transform: rotate(270deg);
+			  }
+			}
+
+			@keyframes rotator {
+			  0% {
+			    -webkit-transform: rotate(0deg);
+			            transform: rotate(0deg);
+			  }
+			  100% {
+			    -webkit-transform: rotate(270deg);
+			            transform: rotate(270deg);
+			  }
+			}
+			.path {
+			  stroke-dasharray: 187;
+			  stroke-dashoffset: 0;
+			  -webkit-transform-origin: center;
+			      -ms-transform-origin: center;
+			          transform-origin: center;
+			  -webkit-animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
+			          animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
+			}
+
+			@-webkit-keyframes colors {
+			  0% {
+			    stroke: #4285F4;
+			  }
+			  25% {
+			    stroke: #DE3E35;
+			  }
+			  50% {
+			    stroke: #F7C223;
+			  }
+			  75% {
+			    stroke: #1B9A59;
+			  }
+			  100% {
+			    stroke: #4285F4;
+			  }
+			}
+
+			@keyframes colors {
+			  0% {
+			    stroke: #4285F4;
+			  }
+			  25% {
+			    stroke: #DE3E35;
+			  }
+			  50% {
+			    stroke: #F7C223;
+			  }
+			  75% {
+			    stroke: #1B9A59;
+			  }
+			  100% {
+			    stroke: #4285F4;
+			  }
+			}
+			@-webkit-keyframes dash {
+			  0% {
+			    stroke-dashoffset: 187;
+			  }
+			  50% {
+			    stroke-dashoffset: 46.75;
+			    -webkit-transform: rotate(135deg);
+			            transform: rotate(135deg);
+			  }
+			  100% {
+			    stroke-dashoffset: 187;
+			    -webkit-transform: rotate(450deg);
+			            transform: rotate(450deg);
+			  }
+			}
+			@keyframes dash {
+			  0% {
+			    stroke-dashoffset: 187;
+			  }
+			  50% {
+			    stroke-dashoffset: 46.75;
+			    -webkit-transform: rotate(135deg);
+			            transform: rotate(135deg);
+			  }
+			  100% {
+			    stroke-dashoffset: 187;
+			    -webkit-transform: rotate(450deg);
+			            transform: rotate(450deg);
+			  }
+			}
+
+			@keyframes dash {
+			 0% { stroke-dashoffset: $offset; }
+			 50% {
+			   stroke-dashoffset: $offset/4;
+			   transform:rotate(135deg);
+			 }
+			 100% {
+			   stroke-dashoffset: $offset;
+			   transform:rotate(450deg);
+			 }
+			}
+
+			.result {
+				width:100%;
+				position: absolute;
+				height:200px;
+				top: 55%;
+			}
+			.result-each{
+				height:220px;
+				-webkit-transition:all 0.5s ease;
+			}
+			.result-image{
+				height:160px;
+				width:60%;
+				margin-left:20%;
+				box-shadow: 0px 0px 5px #000000; 
+				border-radius: 5px;
+				overflow:hidden;
+				cursor: pointer;
+			}
+
+			.result-image:hover{
+				box-shadow: 0px 0px 10px #ffffff; 
+			}
+			.result-text{
+				height:60px;
+				color: white;
+				line-height: 60px; 
+				vertical-align: middle; 
+				font-size: 1.5em; 
+				letter-spacing: 3px; 
+				width:100%; 
+				text-align:center; 
+				text-shadow:0px 0px 3px #000000;
+				-webkit-transform: scale(1,1);
+				opacity: 1;
+			}
+			.result-text:hover{
+				text-shadow:0px 0px 7px #000000;
+			}
+
+			.result-each.ng-hide-remove{
+				-webkit-transform: scale(0.5,0.5);
+				opacity: 0;
+			}
+			a{
+				/*color: white;*/
+				color: rgba(255,255,255,1);
+				/*text-decoration: underline;*/
+			}
+			a:hover{
+				/*text-decoration: underline;*/
+				color: white;
+			}
+			
+		</style>
+	</head>
+	<body ng-controller="indexCtrl as controller">
+		<div class="container-fluid page">
+			<div class="midpage col-md-4 col-md-offset-4 col-xs-12" ng-class="{0: 'searched', 1: 'notsearched', 2: 'searchComplete'}[searching]">
+				<div class="search container-fluid" ng-show="searching !== 2">
+					<div ng-show='waiting'>
+						<svg  class="spinner" width="100px" height="100px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+						   <circle class="path" fill="none" stroke-width="7" stroke-linecap="round" cx="50" cy="50" r="40"></circle>
+						</svg>	
+					</div>
+					
+					<i class="fa fa-search" ng-hide='waiting' style="font-size: 6.4em;"></i>
+					<input class="form-control input-lg search-input" ng-show='!waiting' placeholder="輸入你想要看的劇集" type="text" ng-model="search">
+				</div>
+
+				<div class="search container-fluid" ng-show="searching == 2">
+
+					<div class="col-xs-6" style='height:160px; margin-top:20px;'>
+						<img style='width:100%; height:100%;'  src="{{select.poster}}" alt="">	
+					</div>
+
+					<div class="col-xs-6">
+						<div style='margin-top:20px;'>
+							<div>
+								{{select.name}}
+							</div>
+							
+							<button ng-click="searchAgain()" style="margin-top:20px;" class="btn btn-warning">再搜尋一次</button>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="search-result style-2 container-fluid" ng-show="searching === 0">
+					<div class="each row" ng-repeat='elem in search_result' ng-click="start(elem)">
+						<img style='height: 40px;' class="col-xs-2" src="{{elem.poster}}" alt="">
+						<span class="col-xs-10">{{elem.name}}</span>
+					</div>
+				</div>
+			</div>
+
+			
+			
+		</div>
+		<div class='container-fluid result' ng-show="searching == 2">
+				<div ng-show="searching == 2" ng-repeat="info in predictinfo" class='col-xs-3 result-each'>
+					<div ng-click="showresultVideo(info)" class='result-image' style=''>
+						<img style='width:100%; height:100%;' src="{{info.poster}}" alt="">
+					</div>
+					
+					<div class="result-text" >
+						<a href="{{info.link}}"target="_blank">{{info.name}}</a>
+					</div>
+					
+				</div>
+				
+			</div>
+
+		<div class="video-show" ng-show = 'videoshow'>
+			
+
+			<videogular vg-player-ready="controller.onPlayerReady" vg-complete="controller.onCompleteVideo" vg-theme="controller.config.theme">
+				<vg-video vg-src="controller.config.sources"
+						vg-tracks="controller.config.tracks">
+				</vg-video>
+				<vg-controls>
+					<vg-play-pause-button></vg-play-pause-button>
+					<vg-timedisplay>{{ currentTime | date:'mm:ss' }}</vg-timedisplay>
+					<vg-scrubBar>
+						<vg-scrubbarcurrenttime></vg-scrubbarcurrenttime>
+					</vg-scrubBar>
+					<vg-timedisplay>{{ timeLeft | date:'mm:ss' }}</vg-timedisplay>
+					<vg-volume>
+						<vg-mutebutton></vg-mutebutton>
+						<vg-volumebar></vg-volumebar>
+					</vg-volume>
+					<vg-fullscreenButton></vg-fullscreenButton>
+				</vg-controls>
+	 
+				<vg-overlay-play></vg-overlay-play>
+			</videogular>
+			<div class='end-video' ng-click='endVideo()'>
+				<i class="fa fa-compress"></i>
+			</div>
+		</div>
+
+        
+
+
+
+
+		<script src="controller.js"></script>
+	</body>
+</html>
