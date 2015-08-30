@@ -7,10 +7,10 @@ var app = angular.module('IRapp', [
     "ngAnimate"
 ])
 
-app.controller('indexCtrl', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
+app.controller('indexCtrl', ['$scope', '$http', '$sce', '$timeout', function($scope, $http, $sce, $timeout) {
 
     var controller = this;
-    $scope.host = 'ballchen.cc'
+    $scope.host = 'localhost'
     $scope.searching = 1;
     $scope.videoshow = false;
     $scope.waiting = false;
@@ -63,7 +63,7 @@ app.controller('indexCtrl', ['$scope', '$http', '$sce', function($scope, $http, 
                     // console.log(data.videos[0].id)
 
                 // get video
-                $http.get('http://'+$scope.host+':8083/raw?id=' + data.videos[0].id).success(function(data1) {
+                $http.get('http://' + $scope.host + ':8083/raw?id=' + data.videos[0].id).success(function(data1) {
                     console.log(data1);
 
 
@@ -83,7 +83,7 @@ app.controller('indexCtrl', ['$scope', '$http', '$sce', function($scope, $http, 
                     //send data to python django api
                 $http({
                     method: "POST",
-                    url: "http://"+$scope.host+":8000/test/",
+                    url: "http://" + $scope.host + ":8000/test/",
                     data: {
                         show_id: info.id,
                         show_name: info.name
@@ -112,7 +112,7 @@ app.controller('indexCtrl', ['$scope', '$http', '$sce', function($scope, $http, 
                 console.log('else')
                 $http({
                     method: "POST",
-                    url: "http://"+$scope.host+":8000/test/",
+                    url: "http://" + $scope.host + ":8000/test/",
                     data: {
                         show_id: info.id,
                         show_name: info.name
@@ -165,56 +165,56 @@ app.controller('indexCtrl', ['$scope', '$http', '$sce', function($scope, $http, 
         $scope.videoshow = false;
         $scope.searching = 2;
     }
-    $scope.$watch('predict',function(){
-        if($scope.predict) 
-            {
-                setTimeout(function(){
-                    alertify.success('搜尋結束囉:)')
-                }, 2000)
-                
-            }
+    $scope.$watch('predict', function() {
+        if ($scope.predict) {
+
+            $timeout(function() {
+                alertify.success('搜尋結束囉:)')
+                $scope.searching = 2;
+            }, 2000)
+
+        }
     })
-    $scope.searchAgain = function(){
+    $scope.searchAgain = function() {
         $scope.waiting = false;
         $scope.search = '';
         $scope.searching = 1;
     }
 
-    $scope.showresultVideo = function(info){
-        
+    $scope.showresultVideo = function(info) {
+
         console.log(show)
-        var show = 'https://openapi.youku.com/v2/shows/videos.json?client_id=fd01cd845c0ec773&count=10&show_id='+info.id
+        var show = 'https://openapi.youku.com/v2/shows/videos.json?client_id=fd01cd845c0ec773&count=10&show_id=' + info.id
         $http({
             method: "GET",
             url: show,
-        }).success(function(data){
+        }).success(function(data) {
             console.log(data)
-            if(data.total > 0){
+            if (data.total > 0) {
                 console.log(data.videos[0].id)
 
                 // get video
-                $http.get('http://'+$scope.host+':8083/raw?id='+data.videos[0].id).success(function(data1){
-                    if(data !== 'Error'){
+                $http.get('http://' + $scope.host + ':8083/raw?id=' + data.videos[0].id).success(function(data1) {
+                    if (data !== 'Error') {
                         console.log(data1);
 
-                    
-                        $scope.showvideo = data1+'&.mp4';
+
+                        $scope.showvideo = data1 + '&.mp4';
 
                         controller.API.stop();
-                        controller.config.sources = [
-                            {src: $sce.trustAsResourceUrl(data1+'&.mp4'), type: "video/mp4"}
-                        ];
+                        controller.config.sources = [{
+                            src: $sce.trustAsResourceUrl(data1 + '&.mp4'),
+                            type: "video/mp4"
+                        }];
                         controller.API.play();
                         $scope.videoshow = true;
-                        console.log($scope.showvideo)    
-                    }
-                    else{
+                        console.log($scope.showvideo)
+                    } else {
                         alertify.alert('此影片找不到預告片')
                     }
-                    
+
                 })
-            }
-            else{
+            } else {
                 alertify.alert('此影片找不到預告片')
             }
         })
